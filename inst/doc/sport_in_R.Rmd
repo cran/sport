@@ -1,27 +1,16 @@
-<style>
-  .col2 {
-    columns: 2 200px;
-    -webkit-columns: 2 200px;
-    -moz-columns: 2 200px;
-  }
-
-</style>
 ---
-title: "`sport` The R package for online update algorithms"
+title: "sport an R package for online update algorithms"
 author: "Dawid Kałędkowski"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteIndexEntry{sport an R package for online update algorithms}
   %\VignetteEngine{knitr::rmarkdown}
-  %\VignetteEncoding{UTF-8}
+  %\usepackage[utf8]{inputenc}
 ---
 
 ```{r setup, include = FALSE}
-knitr::opts_chunk$set(
-  collapse = TRUE,
-  comment = "#>"
-)
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
 ```
 
 # About
@@ -95,7 +84,7 @@ For further knowledge read [Stephen J. Roberts, William Penny (2011)](https://ww
 ## Installation
 Install package from CRAN or development version from github.
 
-```{r message=FALSE, warning=FALSE}
+```{r ,message=FALSE, warning=FALSE}
 # devtools::install_github("gogonzo/sport")
 # install.packages("sport")
 library(sport)
@@ -107,7 +96,7 @@ Package contains actual data from Speedway Grand-Prix. There are two data.frames
 1. `gpheats` - results SGP heats. Column `rank` is a numeric version of column `position` - rider position in race.
 2. `gpsquads` - summarized results of the events, with sum of point and final position.
 
-```{r echo=TRUE, message=FALSE, warning=FALSE}
+```{r echo=TRUE}
 str(gpheats)
 ```
 
@@ -122,7 +111,7 @@ gpheats[1:8,c("id","rider","rank")]
 To compute ratings using each algorithms one has to specify formula. Form `rank | id ~ name` is required, which estimates `name` - rating of a player, by observing outputs - `rank`, nested within particular event - `id`. Variable names in formula are unrestricted, but model structure remains the same. All methods are named `method_run`.
 `formula = rank|id ~ name` 
 
-```{r}
+```{r message=FALSE}
 glicko  <- glicko_run(  formula = rank|id ~ rider, data = gpheats )
 glicko2 <- glicko2_run( formula = rank|id ~ rider, data = gpheats )
 bbt     <- bbt_run(     formula = rank|id ~ rider, data = gpheats )
@@ -140,12 +129,10 @@ summary(dbl)
 
 To visualize top n ratings with their 95% confidence interval one can use dedicated `plot.rating` function. For "bdl" method top coefficients are presented not necessarily ratings. It's also possible to examine ratings evolution in time, by specifying `players` argument.
 
-<div class="col2">
 ```{r}
 plot(glicko, n=15)
 plot(glicko, players = c("Greg Hancock","Nicki Pedersen","Jason Crump"))
 ```
-</div>
 
 Except dedicated `print`,`summary` and `plot` there is possibility to extract more detailed information to be analyzed. `rating` object contains following elements:
 
@@ -168,7 +155,7 @@ Examples presented in package overview might be sufficient in most cases, but so
 ## Prior beliefs about `r` and `rd`
 Main functionality which is common between all algorithms is to specify prior `r` and `rd`. Both parameters can be set by creating named vectors. Let's suppose we have 4 players `c("A","B","C","D")` competing in an event, and we have players prior `r` and `rd` estimates. It's important to have `r` and `rd` names corresponding with levels of `name` variable. One can run algorithm, to obtain new estimates.
 
-```{r}
+```{r message=FALSE, warning=FALSE}
 library(dplyr); library(magrittr) # for examples purpose 
 data <- data.frame( id = 1, name = c( "A", "B", "C", "D" ),  rank  = c( 3, 4, 1, 2 ))
 r     <- setNames( c(1500, 1400, 1550, 1700), c("A","B","C","D") )
@@ -229,8 +216,7 @@ sigma   <- unique(gpheats$rider) %>% setNames( runif(0.1,0.5, n = length(.)) , .
 glicko2 <- glicko2_run(rank|id~rider,gpheats, sigma=sigma)
 ```
 
-
-- In glicko and bbt `sigma` needs to be fixed before iteration by adding new column to input data. For example sigma can be column of time difference between events in which player participated - The longer break in competing, the higher sigma is. It is recommended to keep values close to `data$sigma`.
+In glicko and bbt `sigma` needs to be fixed before iteration by adding new column to input data. For example sigma can be column of time difference between events in which player participated - The longer break in competing, the higher sigma is. It is recommended to keep values close to `data$sigma`.
 
 ```{r}
 # bbt example

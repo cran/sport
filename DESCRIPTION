@@ -1,7 +1,7 @@
 Package: sport
 Type: Package
 Title: Sequential Pairwise Online Rating Techniques
-Version: 0.1.0
+Version: 0.1.1
 Depends: R (>= 3.0)
 Authors@R: person("Dawid", "Kałędkowski", email = "dawid.kaledkowski@gmail.com", role = c("aut", "cre"))
 Maintainer: Dawid Kałędkowski <dawid.kaledkowski@gmail.com>
@@ -19,7 +19,7 @@ Description: Calculates ratings for two-player or
   W. Penny, Stephen J. Roberts (1999) <doi:10.1109/IJCNN.1999.832603>.
 BugReports: https://github.com/gogonzo/sport/issues
 Imports: Rcpp (>= 0.12.8), data.table (>= 1.11.0), ggplot2 (>= 3.0.0)
-LinkingTo: Rcpp, RcppArmadillo
+LinkingTo: Rcpp
 License: GPL-2
 Encoding: UTF-8
 URL: https://github.com/gogonzo/sport
@@ -28,7 +28,7 @@ RoxygenNote: 6.1.0
 Suggests: knitr, rmarkdown, testthat, magrittr, dplyr
 VignetteBuilder: knitr
 NeedsCompilation: yes
-Packaged: 2018-08-30 13:55:14 UTC; dkaledkowski
+Packaged: 2018-09-11 10:23:29 UTC; dkaledkowski
 Author: Dawid Kałędkowski [aut, cre]
 Repository: CRAN
-Date/Publication: 2018-09-03 08:20:03 UTC
+Date/Publication: 2018-09-11 17:20:02 UTC

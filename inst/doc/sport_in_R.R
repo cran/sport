@@ -1,21 +1,18 @@
 ## ----setup, include = FALSE----------------------------------------------
-knitr::opts_chunk$set(
-  collapse = TRUE,
-  comment = "#>"
-)
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
 
 ## ----message=FALSE, warning=FALSE----------------------------------------
 # devtools::install_github("gogonzo/sport")
 # install.packages("sport")
 library(sport)
 
-## ----echo=TRUE, message=FALSE, warning=FALSE-----------------------------
+## ----echo=TRUE-----------------------------------------------------------
 str(gpheats)
 
 ## ----echo=FALSE----------------------------------------------------------
 gpheats[1:8,c("id","rider","rank")]
 
-## ------------------------------------------------------------------------
+## ----message=FALSE-------------------------------------------------------
 glicko  <- glicko_run(  formula = rank|id ~ rider, data = gpheats )
 glicko2 <- glicko2_run( formula = rank|id ~ rider, data = gpheats )
 bbt     <- bbt_run(     formula = rank|id ~ rider, data = gpheats )
@@ -36,7 +33,7 @@ names(glicko)
 tail(glicko$r)
 tail(glicko$pairs)
 
-## ------------------------------------------------------------------------
+## ----message=FALSE, warning=FALSE----------------------------------------
 library(dplyr); library(magrittr) # for examples purpose 
 data <- data.frame( id = 1, name = c( "A", "B", "C", "D" ),  rank  = c( 3, 4, 1, 2 ))
 r     <- setNames( c(1500, 1400, 1550, 1700), c("A","B","C","D") )
