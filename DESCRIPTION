@@ -1,7 +1,7 @@
 Package: sport
 Type: Package
 Title: Sequential Pairwise Online Rating Techniques
-Version: 0.1.1
+Version: 0.1.2
 Depends: R (>= 3.0)
 Authors@R: person("Dawid", "Kałędkowski", email = "dawid.kaledkowski@gmail.com", role = c("aut", "cre"))
 Maintainer: Dawid Kałędkowski <dawid.kaledkowski@gmail.com>
@@ -25,10 +25,10 @@ Encoding: UTF-8
 URL: https://github.com/gogonzo/sport
 LazyData: true
 RoxygenNote: 6.1.0
-Suggests: knitr, rmarkdown, testthat, magrittr, dplyr
+Suggests: dplyr, knitr, magrittr, rmarkdown, testthat
 VignetteBuilder: knitr
 NeedsCompilation: yes
-Packaged: 2018-09-11 10:23:29 UTC; dkaledkowski
+Packaged: 2019-01-07 22:14:57 UTC; kaledkod
 Author: Dawid Kałędkowski [aut, cre]
 Repository: CRAN
-Date/Publication: 2018-09-11 17:20:02 UTC
+Date/Publication: 2019-01-07 23:00:10 UTC

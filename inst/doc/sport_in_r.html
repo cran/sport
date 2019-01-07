@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<meta name="author" content="Dawid Kałędkowski" />
+
+<meta name="date" content="2019-01-07" />
+
+<title>sport an R package for online update algorithms</title>
+
+
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css" data-origin="pandoc">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    for (var j = 0; j < rules.length; j++) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' || rule.style.backgroundColor === '') continue;
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+<link href="data:text/css;charset=utf-8,body%20%7B%0Abackground%2Dcolor%3A%20%23fff%3B%0Amargin%3A%201em%20auto%3B%0Amax%2Dwidth%3A%20700px%3B%0Aoverflow%3A%20visible%3B%0Apadding%2Dleft%3A%202em%3B%0Apadding%2Dright%3A%202em%3B%0Afont%2Dfamily%3A%20%22Open%20Sans%22%2C%20%22Helvetica%20Neue%22%2C%20Helvetica%2C%20Arial%2C%20sans%2Dserif%3B%0Afont%2Dsize%3A%2014px%3B%0Aline%2Dheight%3A%201%2E35%3B%0A%7D%0A%23header%20%7B%0Atext%2Dalign%3A%20center%3B%0A%7D%0A%23TOC%20%7B%0Aclear%3A%20both%3B%0Amargin%3A%200%200%2010px%2010px%3B%0Apadding%3A%204px%3B%0Awidth%3A%20400px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Aborder%2Dradius%3A%205px%3B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Afont%2Dsize%3A%2013px%3B%0Aline%2Dheight%3A%201%2E3%3B%0A%7D%0A%23TOC%20%2Etoctitle%20%7B%0Afont%2Dweight%3A%20bold%3B%0Afont%2Dsize%3A%2015px%3B%0Amargin%2Dleft%3A%205px%3B%0A%7D%0A%23TOC%20ul%20%7B%0Apadding%2Dleft%3A%2040px%3B%0Amargin%2Dleft%3A%20%2D1%2E5em%3B%0Amargin%2Dtop%3A%205px%3B%0Amargin%2Dbottom%3A%205px%3B%0A%7D%0A%23TOC%20ul%20ul%20%7B%0Amargin%2Dleft%3A%20%2D2em%3B%0A%7D%0A%23TOC%20li%20%7B%0Aline%2Dheight%3A%2016px%3B%0A%7D%0Atable%20%7B%0Amargin%3A%201em%20auto%3B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dcolor%3A%20%23DDDDDD%3B%0Aborder%2Dstyle%3A%20outset%3B%0Aborder%2Dcollapse%3A%20collapse%3B%0A%7D%0Atable%20th%20%7B%0Aborder%2Dwidth%3A%202px%3B%0Apadding%3A%205px%3B%0Aborder%2Dstyle%3A%20inset%3B%0A%7D%0Atable%20td%20%7B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dstyle%3A%20inset%3B%0Aline%2Dheight%3A%2018px%3B%0Apadding%3A%205px%205px%3B%0A%7D%0Atable%2C%20table%20th%2C%20table%20td%20%7B%0Aborder%2Dleft%2Dstyle%3A%20none%3B%0Aborder%2Dright%2Dstyle%3A%20none%3B%0A%7D%0Atable%20thead%2C%20table%20tr%2Eeven%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Ap%20%7B%0Amargin%3A%200%2E5em%200%3B%0A%7D%0Ablockquote%20%7B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Apadding%3A%200%2E25em%200%2E75em%3B%0A%7D%0Ahr%20%7B%0Aborder%2Dstyle%3A%20solid%3B%0Aborder%3A%20none%3B%0Aborder%2Dtop%3A%201px%20solid%20%23777%3B%0Amargin%3A%2028px%200%3B%0A%7D%0Adl%20%7B%0Amargin%2Dleft%3A%200%3B%0A%7D%0Adl%20dd%20%7B%0Amargin%2Dbottom%3A%2013px%3B%0Amargin%2Dleft%3A%2013px%3B%0A%7D%0Adl%20dt%20%7B%0Afont%2Dweight%3A%20bold%3B%0A%7D%0Aul%20%7B%0Amargin%2Dtop%3A%200%3B%0A%7D%0Aul%20li%20%7B%0Alist%2Dstyle%3A%20circle%20outside%3B%0A%7D%0Aul%20ul%20%7B%0Amargin%2Dbottom%3A%200%3B%0A%7D%0Apre%2C%20code%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0Aborder%2Dradius%3A%203px%3B%0Acolor%3A%20%23333%3B%0Awhite%2Dspace%3A%20pre%2Dwrap%3B%20%0A%7D%0Apre%20%7B%0Aborder%2Dradius%3A%203px%3B%0Amargin%3A%205px%200px%2010px%200px%3B%0Apadding%3A%2010px%3B%0A%7D%0Apre%3Anot%28%5Bclass%5D%29%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Acode%20%7B%0Afont%2Dfamily%3A%20Consolas%2C%20Monaco%2C%20%27Courier%20New%27%2C%20monospace%3B%0Afont%2Dsize%3A%2085%25%3B%0A%7D%0Ap%20%3E%20code%2C%20li%20%3E%20code%20%7B%0Apadding%3A%202px%200px%3B%0A%7D%0Adiv%2Efigure%20%7B%0Atext%2Dalign%3A%20center%3B%0A%7D%0Aimg%20%7B%0Abackground%2Dcolor%3A%20%23FFFFFF%3B%0Apadding%3A%202px%3B%0Aborder%3A%201px%20solid%20%23DDDDDD%3B%0Aborder%2Dradius%3A%203px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Amargin%3A%200%205px%3B%0A%7D%0Ah1%20%7B%0Amargin%2Dtop%3A%200%3B%0Afont%2Dsize%3A%2035px%3B%0Aline%2Dheight%3A%2040px%3B%0A%7D%0Ah2%20%7B%0Aborder%2Dbottom%3A%204px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Apadding%2Dbottom%3A%202px%3B%0Afont%2Dsize%3A%20145%25%3B%0A%7D%0Ah3%20%7B%0Aborder%2Dbottom%3A%202px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Afont%2Dsize%3A%20120%25%3B%0A%7D%0Ah4%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23f7f7f7%3B%0Amargin%2Dleft%3A%208px%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Ah5%2C%20h6%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23ccc%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Aa%20%7B%0Acolor%3A%20%230033dd%3B%0Atext%2Ddecoration%3A%20none%3B%0A%7D%0Aa%3Ahover%20%7B%0Acolor%3A%20%236666ff%3B%20%7D%0Aa%3Avisited%20%7B%0Acolor%3A%20%23800080%3B%20%7D%0Aa%3Avisited%3Ahover%20%7B%0Acolor%3A%20%23BB00BB%3B%20%7D%0Aa%5Bhref%5E%3D%22http%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0Aa%5Bhref%5E%3D%22https%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0A%0Acode%20%3E%20span%2Ekw%20%7B%20color%3A%20%23555%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Edt%20%7B%20color%3A%20%23902000%3B%20%7D%20%0Acode%20%3E%20span%2Edv%20%7B%20color%3A%20%2340a070%3B%20%7D%20%0Acode%20%3E%20span%2Ebn%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Efl%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Ech%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Est%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Eco%20%7B%20color%3A%20%23888888%3B%20font%2Dstyle%3A%20italic%3B%20%7D%20%0Acode%20%3E%20span%2Eot%20%7B%20color%3A%20%23007020%3B%20%7D%20%0Acode%20%3E%20span%2Eal%20%7B%20color%3A%20%23ff0000%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Efu%20%7B%20color%3A%20%23900%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%20code%20%3E%20span%2Eer%20%7B%20color%3A%20%23a61717%3B%20background%2Dcolor%3A%20%23e3d2d2%3B%20%7D%20%0A" rel="stylesheet" type="text/css" />
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">sport an R package for online update algorithms</h1>
+<h4 class="author"><em>Dawid Kałędkowski</em></h4>
+<h4 class="date"><em>2019-01-07</em></h4>
+
+
+
+<div id="about" class="section level1">
+<h1>About</h1>
+<p>Name <code>sport</code> is an abbreviation for Sequential Pairwise Online Rating Techniques. Package contains functions calculating ratings for two-player or multi-player matchups. Methods included in package are able to estimate ratings (players strengths) and their evolution in time, also able to predict output of challenge. Algorithms are based on Bayesian Approximation Method, and they don’t involve any matrix inversions nor likelihood estimation. <code>sport</code> incorporates methods such glicko, glicko2, bayesian Bradley-Terry, dynamic logistic regression. Parameters are updated sequentially, and computation doesn’t require any additional RAM to make estimation feasible. Additionally, base of the package is written in <code>C++</code> what makes <code>sport</code> computation even faster.</p>
+</div>
+<div id="theory" class="section level1">
+<h1>Theory</h1>
+<p>Problem of sport matchups falls into subject of paired comparison modeling and choice modeling. Estimating player skills is equivalent to estimating preference of choice between two alternatives. Just as one product is more preferred over another to buy, similarly better player is more preferred to win over worst. As player/event and alternative/experiment can be used interchangeably, for ease of use sport nomenclature is adapted (player/event).</p>
+<p>Algorithms implemented in a <code>sport</code> package works similarly, as all using Bayesian Approximation Method. Algorithms works as follows: At the moment player <code>i</code> competes with player <code>j</code> while both have initial <span class="math inline">\(R_i\)</span> and <span class="math inline">\(R_j\)</span> ratings. Prior to event, probability that player <code>i</code> win over player <code>j</code> is <span class="math inline">\(\hat{Y_i}\)</span>. After event is finished when true result <span class="math inline">\(Y_{ij}\)</span> is observed, initial believe about rating is changed <span class="math inline">\(R_i^{'} \leftarrow R_i\)</span> according to the prediction error <span class="math inline">\(( Y_{ij} - \hat{Y_{ij}} )\)</span> and some constant <span class="math inline">\(K\)</span>. Updates are summed as player can compete with more than one player in particular event.</p>
+<p><span class="math display">\[\large R_i^{'} \leftarrow R_i + \sum_{j \neq i}{ K * ( Y_{ij} - \hat{Y_{ij}}}  )\]</span> Where: <span class="math display">\[\large \hat{Y} = P(X_i &gt; X_j)\]</span> <span class="math display">\[K - learning rate\]</span></p>
+<p>Outcome probability function is based on <a href="https://en.wikipedia.org/wiki/Bradley%E2%80%93Terry_model">Bradley-Terry model</a> designed to predict outcome of pairwise comparison. For multi-player matchups where output is a ranking, <code>sport</code> package uses the same data transformation as in <a href="https://www.jstor.org/stable/270983">exploded logit</a> - ranking is then presented as combination of all possible pairs competing within same event.</p>
+<div id="glicko-rating-system" class="section level2">
+<h2>Glicko rating system</h2>
+<p>Glicko is the first bayesian online update algorithm incorporating rating volatility to rating and outcome computation. Glicko system is not balanced, and sum of rating rewards of all players are not zero. In one 2-players event, reward of player <code>i</code> differs from reward of player <code>q</code> as it depends on their individual ratings deviation. Rating values oscillates around <code>r=1500</code> with max deviation <code>rd&lt;=350</code>.</p>
+<p>For deeper knowledge read <a href="http://www.glicko.net/research/glicko.pdf">Mark E. Glickman (1999)</a>.</p>
+<p>Update Rules:</p>
+<p><span class="math display">\[\hat{Y_{ij}} = P(X_i&gt;X_j) = \frac{1}{ 1 + 10^{-g(RD_{ij}) * (R_i-R_j)/400}}\]</span></p>
+<p><span class="math display">\[{R'}_i = R_i +  \frac{1}{\frac{1}{{RD}^2_{i}} + \frac{1}{d^2_i}} * \sum_j{g(RD_j) * (Y_{ij} - \hat{Y_{ij}})  }\]</span></p>
+<p><span class="math display">\[{RD'}_i = \sqrt{(\frac{1}{{RD}^2_{i}} + \frac{1}{d^2_i}})^{-1}\]</span></p>
+</div>
+<div id="glicko2-rating-system" class="section level2">
+<h2>Glicko2 rating system</h2>
+<p>Glicko2 improved predecessor by adding volatile parameter <span class="math inline">\(\sigma_i\)</span> which increase/decrease rating deviation in periods when player performance differs from expected. Sigma is estimated iteratively using Illinois algorithm, which converges quickly not affecting computation time. Rating values oscillates around <code>r=1500</code> with max deviation <code>rd&lt;=350</code>.</p>
+<p>For further knowledge read <a href="http://www.glicko.net/glicko/glicko2.pdf">Mark E. Glickman (2013)</a></p>
+<p><span class="math display">\[ \hat{Y_{ij}} = \frac{1}{1 + e^{-g(\phi_{ij})*(\mu_i  - \mu_j)} }\]</span></p>
+<p><span class="math display">\[ {\phi'}_i = \frac{1}{\sqrt{ \frac{1}{ { {\phi_i}^2 + {\sigma'_i}^2}} + \frac{1}{v}  }}\]</span></p>
+<p><span class="math display">\[ {\mu'_i} = \mu_i + {\phi'}_i * \sum_j{g(\phi_j)*(Y_{ij} - \hat{Y_{ij}})} \]</span></p>
+</div>
+<div id="bayesian-bradley-terry" class="section level2">
+<h2>Bayesian Bradley Terry</h2>
+<p>The fastest algorithm with simple formula. Original BT formula lacks variance parameter, and this method incorporates rating deviation into model. BBT also prevents against fast <code>rd</code> decline to zero using <code>gamma</code> and <code>kappa</code>.</p>
+<p>For further knowledge read <a href="http://jmlr.csail.mit.edu/papers/volume12/weng11a/weng11a.pdf">Ruby C. Weng and Chih-Jen Lin (2011)</a></p>
+<p><span class="math display">\[\hat{Y_{ij}} = P(X_i&gt;X_j) = \frac{e^{R_i/c_{i_j}}}{e^{R_i/c_{ij}} + e^{R_j/c_{ij}}} \]</span></p>
+<p><span class="math display">\[{R'}_i = R_i + \sum_j{\frac{RD_i^2}{c_{ij}}*(Y_{ij} - \hat{Y_{ij}})}\]</span></p>
+<p><span class="math display">\[{RD'}_i = RD_i * [ 1 - \frac{RD_{ij}^2}{RD_i^2}\sum_j{ \gamma_j * (\frac{RD_i}{c_{ij}})^2* \hat{Y_{ij}}\hat{Y_{ji}}   } ]\]</span></p>
+</div>
+<div id="dynamic-bayesian-logit" class="section level2">
+<h2>Dynamic Bayesian Logit</h2>
+<p>Following algorithm gives some advantages over mentioned rating systems, adding other important factors to estimation process making final ratings unbiased. Algorithm perform better in disciples where other variables can make a difference in result eg. home field advantage. DBL implements Extended Kalman Filter learning rule, and allows to estimate multiple parameters in addition to player ratings. DBL is a Dynamic Logit extended to usage in pairwise comparisons by modeling differences in players characteristics. Classic Bradley-Terry model is enriched by moderation element <span class="math inline">\(K(s_t)\)</span> which adds prior uncertainty to output prediction.</p>
+<p><span class="math display">\[\hat{Y_{ij}} = \frac{ e^{-K(s_t)w _t^T(x_{it}-x_{jt})} }{1+e^{-K(s_t)w _t^T(x_{it}-x_{jt})}}\]</span> Parameters for player <code>i</code> competing with player <code>j</code> are estimated using EKF update rule. <span class="math display">\[\hat{\omega}_{it} = \hat{\omega}_{i(t-1)} + \frac{RD^2_{i(t-1)}}{1+\hat{Y_{ij}}  (1-\hat{Y_{ij}})}  x_t (Y_{ij} - \hat{Y_{ij}})\]</span> <span class="math display">\[RD^2_{i t} = RD^2_{i(t-1)} - \frac{\hat{Y_{ij}}(1-\hat{Y_{ij}})}{1+\hat{Y_{ij}}  (1-\hat{Y_{ij}})s_t^2}(RD^2_{i(t-1)}x_i)(RD^2_{i(t-1)}x_i)^T\]</span></p>
+<p>For further knowledge read <a href="https://www.researchgate.net/publication/2465226_Dynamic_Logistic_Regression">Stephen J. Roberts, William Penny (2011)</a></p>
+</div>
+</div>
+<div id="package-usage" class="section level1">
+<h1>Package Usage</h1>
+<div id="installation" class="section level2">
+<h2>Installation</h2>
+<p>Install package from CRAN or development version from github.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># devtools::install_github(&quot;gogonzo/sport&quot;)</span>
+<span class="co"># install.packages(&quot;sport&quot;)</span>
+<span class="kw">library</span>(sport)</code></pre></div>
+</div>
+<div id="available-data" class="section level2">
+<h2>Available Data</h2>
+<p>Package contains actual data from Speedway Grand-Prix. There are two data.frames:</p>
+<ol style="list-style-type: decimal">
+<li><code>gpheats</code> - results SGP heats. Column <code>rank</code> is a numeric version of column <code>position</code> - rider position in race.</li>
+<li><code>gpsquads</code> - summarized results of the events, with sum of point and final position.</li>
+</ol>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">str</span>(gpheats)
+<span class="co">#&gt; 'data.frame':    20649 obs. of  11 variables:</span>
+<span class="co">#&gt;  $ id      : num  1 1 1 1 2 2 2 2 3 3 ...</span>
+<span class="co">#&gt;  $ season  : int  1995 1995 1995 1995 1995 1995 1995 1995 1995 1995 ...</span>
+<span class="co">#&gt;  $ date    : POSIXct, format: &quot;1995-05-20 18:00:00&quot; &quot;1995-05-20 18:00:00&quot; ...</span>
+<span class="co">#&gt;  $ round   : int  1 1 1 1 1 1 1 1 1 1 ...</span>
+<span class="co">#&gt;  $ name    : chr  &quot;Speedway Grand Prix of Poland&quot; &quot;Speedway Grand Prix of Poland&quot; &quot;Speedway Grand Prix of Poland&quot; &quot;Speedway Grand Prix of Poland&quot; ...</span>
+<span class="co">#&gt;  $ heat    : int  1 1 1 1 2 2 2 2 3 3 ...</span>
+<span class="co">#&gt;  $ field   : int  1 2 3 4 1 2 3 4 1 2 ...</span>
+<span class="co">#&gt;  $ rider   : chr  &quot;Tomasz Gollob&quot; &quot;Gary Havelock&quot; &quot;Chris Louis&quot; &quot;Tony Rickardsson&quot; ...</span>
+<span class="co">#&gt;  $ points  : int  2 0 3 1 3 0 1 2 0 2 ...</span>
+<span class="co">#&gt;  $ position: chr  &quot;2&quot; &quot;4&quot; &quot;1&quot; &quot;3&quot; ...</span>
+<span class="co">#&gt;  $ rank    : num  2 4 1 3 1 4 3 2 4 2 ...</span></code></pre></div>
+<p>Data used in <code>sport</code> package must be in so called long format. Typically data.frame contains at least <code>id</code>, <code>name</code> and <code>rank</code>, with one row for one player within specific match. Package allows for any number of players within event and allows ties also. For all games, <em>output needs to be a rank/position in event</em>. Don’t mix up rank output with typical 1-win, 0-lost. In <code>sport</code> package output for two player game is 1-winner 2-looser. Below example of two matches with 4 players each.</p>
+<pre><code>#&gt;   id             rider rank
+#&gt; 1  1     Tomasz Gollob    2
+#&gt; 2  1     Gary Havelock    4
+#&gt; 3  1       Chris Louis    1
+#&gt; 4  1  Tony Rickardsson    3
+#&gt; 5  2     Sam Ermolenko    1
+#&gt; 6  2    Jan Staechmann    4
+#&gt; 7  2     Tommy Knudsen    3
+#&gt; 8  2 Henrik Gustafsson    2</code></pre>
+</div>
+<div id="estimate-dynamic-ratings" class="section level2">
+<h2>Estimate dynamic ratings</h2>
+<p>To compute ratings using each algorithms one has to specify formula. Form <code>rank | id ~ name</code> is required, which estimates <code>name</code> - rating of a player, by observing outputs - <code>rank</code>, nested within particular event - <code>id</code>. Variable names in formula are unrestricted, but model structure remains the same. All methods are named <code>method_run</code>. <code>formula = rank|id ~ name</code></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">glicko  &lt;-<span class="st"> </span><span class="kw">glicko_run</span>(  <span class="dt">formula =</span> rank<span class="op">|</span>id <span class="op">~</span><span class="st"> </span>rider, <span class="dt">data =</span> gpheats )
+glicko2 &lt;-<span class="st"> </span><span class="kw">glicko2_run</span>( <span class="dt">formula =</span> rank<span class="op">|</span>id <span class="op">~</span><span class="st"> </span>rider, <span class="dt">data =</span> gpheats )
+bbt     &lt;-<span class="st"> </span><span class="kw">bbt_run</span>(     <span class="dt">formula =</span> rank<span class="op">|</span>id <span class="op">~</span><span class="st"> </span>rider, <span class="dt">data =</span> gpheats )
+dbl     &lt;-<span class="st"> </span><span class="kw">dbl_run</span>(     <span class="dt">formula =</span> rank<span class="op">|</span>id <span class="op">~</span><span class="st"> </span>rider, <span class="dt">data =</span> gpheats )
+<span class="kw">print</span>(dbl)
+<span class="co">#&gt; </span>
+<span class="co">#&gt; Call: rank | id ~ rider</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; Number of unique pairs: 31081</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; Accuracy of the model: 0.62</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; True probabilities and Accuracy in predicted intervals:</span>
+<span class="co">#&gt;      Interval Model probability True probability Accuracy     n</span>
+<span class="co">#&gt;  1:   [0,0.1]             0.076            0.164    0.835   436</span>
+<span class="co">#&gt;  2: (0.1,0.2]             0.158            0.252    0.747  2217</span>
+<span class="co">#&gt;  3: (0.2,0.3]             0.257            0.300    0.699  5447</span>
+<span class="co">#&gt;  4: (0.3,0.4]             0.353            0.372    0.626 10113</span>
+<span class="co">#&gt;  5: (0.4,0.5]             0.450            0.454    0.545 12911</span>
+<span class="co">#&gt;  6: (0.5,0.6]             0.550            0.546    0.545 12825</span>
+<span class="co">#&gt;  7: (0.6,0.7]             0.647            0.628    0.626 10113</span>
+<span class="co">#&gt;  8: (0.7,0.8]             0.743            0.700    0.699  5447</span>
+<span class="co">#&gt;  9: (0.8,0.9]             0.842            0.748    0.747  2217</span>
+<span class="co">#&gt; 10:   (0.9,1]             0.924            0.836    0.835   436</span></code></pre></div>
+</div>
+<div id="output" class="section level2">
+<h2>Output</h2>
+<p>Objects returned by <code>method_run</code> are of class <code>rating</code> and have their own <code>print</code> <code>summary</code> which provides most important informations. -<code>print.sport</code> shows condensed informations about model performance like accuracy and consistency of model predictions with observed probabilities. More profound summarization are given by <code>summary</code> by showing ratings, ratings deviations and comparing model win probabilities with observed.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">summary</span>(dbl)
+<span class="co">#&gt; $formula</span>
+<span class="co">#&gt; rank | id ~ rider</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; $method</span>
+<span class="co">#&gt; [1] &quot;dbl&quot;</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; $`Overall Accuracy`</span>
+<span class="co">#&gt; [1] 0.6167273</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; $`Number of pairs`</span>
+<span class="co">#&gt; [1] 62162</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; $r</span>
+<span class="co">#&gt;                  name      r    rd Model probability True probability</span>
+<span class="co">#&gt;   1:    Tomasz Gollob  1.329 0.005             0.572            0.587</span>
+<span class="co">#&gt;   2:    Gary Havelock  0.696 0.111             0.410            0.476</span>
+<span class="co">#&gt;   3:      Chris Louis  0.205 0.023             0.523            0.505</span>
+<span class="co">#&gt;   4: Tony Rickardsson  1.793 0.012             0.684            0.703</span>
+<span class="co">#&gt;   5:    Sam Ermolenko  0.552 0.064             0.534            0.546</span>
+<span class="co">#&gt;  ---                                                                 </span>
+<span class="co">#&gt; 209:   Justin Sedgmen -0.508 0.511             0.347            0.267</span>
+<span class="co">#&gt; 210:    Rohan Tungate  2.880 0.712             0.537            1.000</span>
+<span class="co">#&gt; 211:    Maksym Drabik  0.693 0.731             0.297            0.429</span>
+<span class="co">#&gt; 212:       Dan Bewley -0.271 0.837             0.307            0.250</span>
+<span class="co">#&gt; 213:       Joel Kling  0.644 0.831             0.305            0.500</span>
+<span class="co">#&gt;      Accuracy pairings</span>
+<span class="co">#&gt;   1:    0.591     2718</span>
+<span class="co">#&gt;   2:    0.659      126</span>
+<span class="co">#&gt;   3:    0.580      605</span>
+<span class="co">#&gt;   4:    0.699     1313</span>
+<span class="co">#&gt;   5:    0.523      216</span>
+<span class="co">#&gt;  ---                  </span>
+<span class="co">#&gt; 209:    0.800       15</span>
+<span class="co">#&gt; 210:    0.625        8</span>
+<span class="co">#&gt; 211:    0.714        7</span>
+<span class="co">#&gt; 212:    0.750        4</span>
+<span class="co">#&gt; 213:    0.500        4</span></code></pre></div>
+<p>To visualize top n ratings with their 95% confidence interval one can use dedicated <code>plot.rating</code> function. For “bdl” method top coefficients are presented not necessarily ratings. It’s also possible to examine ratings evolution in time, by specifying <code>players</code> argument.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot</span>(glicko, <span class="dt">n=</span><span class="dv">15</span>)</code></pre></div>
+<p><img src="data:image/png;base64,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" /><!-- --></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot</span>(glicko, <span class="dt">players =</span> <span class="kw">c</span>(<span class="st">&quot;Greg Hancock&quot;</span>,<span class="st">&quot;Nicki Pedersen&quot;</span>,<span class="st">&quot;Jason Crump&quot;</span>))</code></pre></div>
+<p><img src="data:image/png;base64,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" /><!-- --></p>
+<p>Except dedicated <code>print</code>,<code>summary</code> and <code>plot</code> there is possibility to extract more detailed information to be analyzed. <code>rating</code> object contains following elements:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">names</span>(glicko)
+<span class="co">#&gt; [1] &quot;final_r&quot;  &quot;final_rd&quot; &quot;r&quot;        &quot;pairs&quot;</span></code></pre></div>
+<ul>
+<li><code>rating$final_r</code> and <code>rating$final_rd</code> contains ratings and ratings deviations estimations.</li>
+<li><code>r</code> contains data.frame with sequential ratings estimations from first event to the last. Number of rows in <code>r</code> equals number of rows in input data.</li>
+<li><code>pairs</code> pairwise combinations of players in analyzed events with prior probability and result of a challenge.</li>
+</ul>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">tail</span>(glicko<span class="op">$</span>r)
+<span class="co">#&gt;      id             name        r        rd     p_win</span>
+<span class="co">#&gt; 1: 5154   Martin Vaculik 1556.186 15.598332 0.1134510</span>
+<span class="co">#&gt; 2: 5154     Patryk Dudek 1668.852 19.472240 0.4256283</span>
+<span class="co">#&gt; 3: 5155      Matej Žagar 1587.954  9.007093 0.2132507</span>
+<span class="co">#&gt; 4: 5155 Fredrik Lindgren 1588.903  8.318461 0.2167572</span>
+<span class="co">#&gt; 5: 5155   Martin Vaculik 1554.414 15.552804 0.1448214</span>
+<span class="co">#&gt; 6: 5155   Nicki Pedersen 1652.299  6.677019 0.4251707</span>
+<span class="kw">tail</span>(glicko<span class="op">$</span>pairs)
+<span class="co">#&gt;      id           name         opponent         P Y</span>
+<span class="co">#&gt; 1: 5155 Martin Vaculik      Matej Žagar 0.4548475 0</span>
+<span class="co">#&gt; 2: 5155 Martin Vaculik Fredrik Lindgren 0.4528676 0</span>
+<span class="co">#&gt; 3: 5155 Martin Vaculik   Nicki Pedersen 0.3656971 0</span>
+<span class="co">#&gt; 4: 5155 Nicki Pedersen      Matej Žagar 0.5914313 1</span>
+<span class="co">#&gt; 5: 5155 Nicki Pedersen Fredrik Lindgren 0.5895059 1</span>
+<span class="co">#&gt; 6: 5155 Nicki Pedersen   Martin Vaculik 0.6343029 1</span></code></pre></div>
+</div>
+</div>
+<div id="advanced-sport" class="section level1">
+<h1>Advanced sport</h1>
+<p>Examples presented in package overview might be sufficient in most cases, but sometimes it is necessary to adjust algorithms to fit data better. One characteristic of the online update algorithms is that variance other parameters quickly drops to zero. Especially, when the number of events for the player is big ($n_i&gt;100 $), after hundreds iterations rating parameters are very difficult to change, and output probabilities are so extreme. To avoid these mistakes some additional controls should be applied, which is explained in this section with easy to learn examples.</p>
+<div id="prior-beliefs-about-r-and-rd" class="section level2">
+<h2>Prior beliefs about <code>r</code> and <code>rd</code></h2>
+<p>Main functionality which is common between all algorithms is to specify prior <code>r</code> and <code>rd</code>. Both parameters can be set by creating named vectors. Let’s suppose we have 4 players <code>c(&quot;A&quot;,&quot;B&quot;,&quot;C&quot;,&quot;D&quot;)</code> competing in an event, and we have players prior <code>r</code> and <code>rd</code> estimates. It’s important to have <code>r</code> and <code>rd</code> names corresponding with levels of <code>name</code> variable. One can run algorithm, to obtain new estimates.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(dplyr); <span class="kw">library</span>(magrittr) <span class="co"># for examples purpose </span>
+data &lt;-<span class="st"> </span><span class="kw">data.frame</span>( <span class="dt">id =</span> <span class="dv">1</span>, <span class="dt">name =</span> <span class="kw">c</span>( <span class="st">&quot;A&quot;</span>, <span class="st">&quot;B&quot;</span>, <span class="st">&quot;C&quot;</span>, <span class="st">&quot;D&quot;</span> ),  <span class="dt">rank  =</span> <span class="kw">c</span>( <span class="dv">3</span>, <span class="dv">4</span>, <span class="dv">1</span>, <span class="dv">2</span> ))
+r     &lt;-<span class="st"> </span><span class="kw">setNames</span>( <span class="kw">c</span>(<span class="dv">1500</span>, <span class="dv">1400</span>, <span class="dv">1550</span>, <span class="dv">1700</span>), <span class="kw">c</span>(<span class="st">&quot;A&quot;</span>,<span class="st">&quot;B&quot;</span>,<span class="st">&quot;C&quot;</span>,<span class="st">&quot;D&quot;</span>) )
+rd    &lt;-<span class="st"> </span><span class="kw">setNames</span>( <span class="kw">c</span>(<span class="dv">200</span>, <span class="dv">30</span>, <span class="dv">100</span>, <span class="dv">300</span>), <span class="kw">c</span>(<span class="st">&quot;A&quot;</span>,<span class="st">&quot;B&quot;</span>,<span class="st">&quot;C&quot;</span>,<span class="st">&quot;D&quot;</span>) )
+
+model &lt;-<span class="st"> </span><span class="kw">glicko_run</span>(rank<span class="op">|</span>id <span class="op">~</span><span class="st"> </span>name, <span class="dt">data=</span>data, <span class="dt">r=</span>r, <span class="dt">rd=</span>rd)
+<span class="kw">print</span>(model<span class="op">$</span>final_r)
+<span class="co">#&gt;        A        B        C        D </span>
+<span class="co">#&gt; 1464.297 1396.039 1606.521 1674.836</span></code></pre></div>
+<p>We can also run models using previously estimated parameters from <code>model$final_r</code> and <code>model$final_rd</code> in next event.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">data2 &lt;-<span class="st"> </span><span class="kw">data.frame</span>( <span class="dt">id =</span> <span class="dv">2</span>, <span class="dt">name =</span> <span class="kw">c</span>( <span class="st">&quot;A&quot;</span>, <span class="st">&quot;B&quot;</span>, <span class="st">&quot;C&quot;</span>, <span class="st">&quot;D&quot;</span> ),  <span class="dt">rank  =</span> <span class="dv">1</span><span class="op">:</span><span class="dv">4</span> )
+r     &lt;-<span class="st"> </span>model<span class="op">$</span>final_r
+rd    &lt;-<span class="st"> </span>model<span class="op">$</span>final_rd
+
+<span class="kw">glicko_run</span>(rank<span class="op">|</span>id <span class="op">~</span><span class="st"> </span>name, data, <span class="dt">r=</span>r, <span class="dt">rd=</span>rd)<span class="op">$</span>final_r
+<span class="co">#&gt;        A        B        C        D </span>
+<span class="co">#&gt; 1451.417 1392.132 1650.762 1661.553</span></code></pre></div>
+</div>
+<div id="tuning-update-size-by-weight" class="section level2">
+<h2>Tuning update size by <code>weight</code></h2>
+<p>All algorithms have a weight argument which increases or decreases update change. Higher weight increasing impact of corresponding event. Effect of the weight on update size can be expressed directly by following formula - <span class="math inline">\(\small R_i^{'} \leftarrow R_i + weight \sum_{j \neq i}{ K ( Y_{ij} - \hat{Y_{ij}}} )\)</span>. To specify weight one needs to add create additional column in input data, and name a column in <code>weight</code> argument. For example weight could depend on importance of competition. In speedway Grand-Prix last three heats determine event winner and thus have higher weight.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">gpheats <span class="op">%&lt;&gt;%</span><span class="st"> </span><span class="kw">mutate</span>(<span class="dt">weight =</span> <span class="kw">ifelse</span>(heat <span class="op">&gt;=</span><span class="st"> </span>(<span class="kw">max</span>(heat)<span class="op">-</span><span class="dv">3</span>),<span class="dv">2</span>,<span class="dv">1</span>) )
+glicko  &lt;-<span class="st"> </span><span class="kw">glicko_run</span>(rank<span class="op">|</span>id <span class="op">~</span><span class="st"> </span>rider, gpheats, <span class="dt">weight=</span><span class="st">&quot;weight&quot;</span>)
+<span class="co">#&gt; r is missing and will set to default=1500</span>
+<span class="co">#&gt; rd is missing and will set to default=350</span></code></pre></div>
+</div>
+<div id="avoiding-excessive-rd-shringe-with-kappa" class="section level2">
+<h2>Avoiding excessive RD shringe with <code>kappa</code></h2>
+<p>In situation when games are playing very frequently by a player, <code>rd</code> can quickly decrease to zero, making further changes limited. Setting <code>kappa</code> disallows deviation decrease to be lower than specified fraction of <code>rd</code>. In other words final <code>rd</code> can’t be lower than initial <code>RD</code> times <code>kappa</code> <span class="math inline">\(\small RD' \geq RD * kappa\)</span>.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">bbt1 &lt;-<span class="st"> </span><span class="kw">bbt_run</span>(rank<span class="op">|</span>id<span class="op">~</span>rider, gpheats,<span class="dt">kappa=</span><span class="fl">0.9</span>)
+<span class="co">#&gt; r is missing and will set to default=25</span>
+<span class="co">#&gt; rd is missing and will set to default=8.33333333333333</span>
+bbt2 &lt;-<span class="st"> </span><span class="kw">bbt_run</span>(rank<span class="op">|</span>id<span class="op">~</span>rider, gpheats,<span class="dt">kappa=</span><span class="fl">0.5</span>)
+<span class="co">#&gt; r is missing and will set to default=25</span>
+<span class="co">#&gt; rd is missing and will set to default=8.33333333333333</span>
+
+<span class="kw">all</span>(bbt1<span class="op">$</span>final_rd <span class="op">&gt;</span><span class="st"> </span>bbt2<span class="op">$</span>final_rd)
+<span class="co">#&gt; [1] FALSE</span></code></pre></div>
+</div>
+<div id="control-output-uncertainty-by-beta" class="section level2">
+<h2>Control output uncertainty by <code>beta</code></h2>
+<p>To increase/decrease uncertainty of challenge output one can define <code>beta</code>. Increasing <code>beta</code> flatten probabilities of winning challenge equalizing competitors chances. This element differs from <code>sigma</code> by not affecting <code>rd</code> directly but to adjust prediction. This argument can be used in bbt and dbl by identifying column in input data where beta is stored. It is worth to specify <code>beta</code> in events when level of competition is higher than usual e.g. derby, knock-out phase, decisive matches, exhibitions and friendlies. Let’s assume that <code>beta</code> follows the same rule as previously set <code>weight</code>.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">gpheats <span class="op">%&lt;&gt;%</span><span class="st"> </span><span class="kw">mutate</span>(<span class="dt">beta =</span> <span class="kw">ifelse</span>(heat <span class="op">&gt;=</span><span class="st"> </span>(<span class="kw">max</span>(heat)<span class="op">-</span><span class="dv">3</span>),<span class="dv">2</span>,<span class="dv">1</span>)  )
+dbl &lt;-<span class="st"> </span><span class="kw">dbl_run</span>(rank<span class="op">|</span>id<span class="op">~</span>rider, <span class="dt">beta=</span><span class="st">&quot;beta&quot;</span>, <span class="dt">data=</span>gpheats) </code></pre></div>
+</div>
+<div id="influence-ratings-volatility-by-sigma" class="section level2">
+<h2>Influence ratings volatility by <code>sigma</code></h2>
+<p>In some periods player ratings tends to fluctuate more, when players form is more unstable. Sigma is na additional parameter controlling volatility of the ratings, making update bigger for higher values of sigma. Strictly, sigma can be expressed by <span class="math inline">\(\small rd_i' = \sqrt{rd_i^2+\sigma_i^2}\)</span>. Sigma can be specified in two ways: - In glicko2 <code>sigma</code> is another parameter per player estimated simultaneously with <code>r</code> and <code>rd</code>. One can specify prior sigma in the same manner as <code>r</code> and <code>rd</code> by creating named vector of positive values. Sigma values depends on a particular application, and priors should be chosen by user.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">sigma   &lt;-<span class="st"> </span><span class="kw">unique</span>(gpheats<span class="op">$</span>rider) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">setNames</span>( <span class="kw">runif</span>(<span class="fl">0.1</span>,<span class="fl">0.5</span>, <span class="dt">n =</span> <span class="kw">length</span>(.)) , . )
+glicko2 &lt;-<span class="st"> </span><span class="kw">glicko2_run</span>(rank<span class="op">|</span>id<span class="op">~</span>rider,gpheats, <span class="dt">sigma=</span>sigma)
+<span class="co">#&gt; r is missing and will set to default=1500</span>
+<span class="co">#&gt; rd is missing and will set to default=350</span></code></pre></div>
+<p>In glicko and bbt <code>sigma</code> needs to be fixed before iteration by adding new column to input data. For example sigma can be column of time difference between events in which player participated - The longer break in competing, the higher sigma is. It is recommended to keep values close to <code>data$sigma</code>.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># bbt example</span>
+gpheats <span class="op">%&lt;&gt;%</span>
+<span class="st">  </span><span class="kw">group_by</span>(rider) <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">mutate</span>( <span class="dt">days_scaled =</span> <span class="kw">as.integer</span>(date <span class="op">-</span><span class="st"> </span><span class="kw">lag</span>(date))<span class="op">/</span><span class="dv">90</span>,
+          <span class="dt">days_scaled =</span> <span class="kw">if_else</span>(days_scaled<span class="op">&gt;</span><span class="dv">1</span>,<span class="fl">1.0</span>, days_scaled)) <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">filter</span>( <span class="op">!</span><span class="kw">is.na</span>(days_scaled) )
+
+bbt &lt;-<span class="st"> </span><span class="kw">bbt_run</span>( rank<span class="op">|</span>id <span class="op">~</span><span class="st"> </span>rider, <span class="dt">data=</span>gpheats, <span class="dt">sigma=</span><span class="st">&quot;days_scaled&quot;</span>)
+<span class="co">#&gt; r is missing and will set to default=25</span>
+<span class="co">#&gt; rd is missing and will set to default=8.33333333333333</span></code></pre></div>
+</div>
+</div>
+
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
