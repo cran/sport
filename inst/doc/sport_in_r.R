@@ -1,80 +1,130 @@
-## ----setup, include = FALSE----------------------------------------------
-knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
+## ----eval=FALSE, warning=FALSE , message=FALSE--------------------------------
+#  install.packages("sport")
+#  devtools::install_github("gogonzo/sport")
 
-## ----message=FALSE, warning=FALSE----------------------------------------
-# devtools::install_github("gogonzo/sport")
-# install.packages("sport")
+## ----echo=TRUE----------------------------------------------------------------
 library(sport)
+data <- gpheats[1:1002, ]
+str(data)
 
-## ----echo=TRUE-----------------------------------------------------------
-str(gpheats)
+## ----echo=FALSE---------------------------------------------------------------
+data[1:8, c("id","rider","rank")]
 
-## ----echo=FALSE----------------------------------------------------------
-gpheats[1:8,c("id","rider","rank")]
+## ----message=FALSE------------------------------------------------------------
+glicko <- glicko_run(formula = rank | id ~ player(rider), data = data)
+glicko2 <- glicko2_run(formula = rank | id ~ player(rider), data = data)
+bbt <- bbt_run(formula = rank | id ~ player(rider), data = data)
+dbl <- dbl_run(formula = rank | id ~ player(rider), data = data)
 
-## ----message=FALSE-------------------------------------------------------
-glicko  <- glicko_run(  formula = rank|id ~ rider, data = gpheats )
-glicko2 <- glicko2_run( formula = rank|id ~ rider, data = gpheats )
-bbt     <- bbt_run(     formula = rank|id ~ rider, data = gpheats )
-dbl     <- dbl_run(     formula = rank|id ~ rider, data = gpheats )
-print(dbl)
+print(glicko)
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 summary(dbl)
 
-## ------------------------------------------------------------------------
-plot(glicko, n=15)
-plot(glicko, players = c("Greg Hancock","Nicki Pedersen","Jason Crump"))
+## ----message=FALSE, fig.show='hold', out.width = "50%"------------------------
+plot(glicko, n = 15)
+plot(glicko, players = c("Greg HANCOCK","Tomasz GOLLOB","Tony RICKARDSSON"))
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 names(glicko)
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 tail(glicko$r)
 tail(glicko$pairs)
 
-## ----message=FALSE, warning=FALSE----------------------------------------
-library(dplyr); library(magrittr) # for examples purpose 
-data <- data.frame( id = 1, name = c( "A", "B", "C", "D" ),  rank  = c( 3, 4, 1, 2 ))
-r     <- setNames( c(1500, 1400, 1550, 1700), c("A","B","C","D") )
-rd    <- setNames( c(200, 30, 100, 300), c("A","B","C","D") )
+## -----------------------------------------------------------------------------
+glicko2 <- glicko2_run(
+  data = data.frame(
+    id = c(1, 1, 1, 1),
+    player = c("a", "b", "c", "d"),
+    rank_player = c(3, 4, 1, 2)
+  ), 
+  formula = rank_player | id ~ player(player)
+)
 
-model <- glicko_run(rank|id ~ name, data=data, r=r, rd=rd)
-print(model$final_r)
+## -----------------------------------------------------------------------------
+glicko2 <- glicko2_run(
+  data = data.frame(
+    id = c(1, 1, 1, 1),
+    team = c("A", "A", "B", "B"),
+    player = c("a", "b", "c", "d"),
+    rank_team = c(1, 1, 2, 2)
+  ), 
+  formula = rank_team | id ~ player(player | team)
+ )
+
+## -----------------------------------------------------------------------------
+dbl <- dbl_run(
+  data = data.frame(
+    id = c(1, 1, 1, 1),
+    name = c("A", "B", "C", "D"),
+    rank = c(3, 4, 1, 2),
+    gate = c(1, 2, 3, 4),
+    factor1 = c("a", "a", "b", "b"),
+    factor2 = c("a", "b", "a", "b")
+  ), 
+  formula = rank | id ~ player(name) + gate * factor1)
 
 
-## ------------------------------------------------------------------------
-data2 <- data.frame( id = 2, name = c( "A", "B", "C", "D" ),  rank  = 1:4 )
-r     <- model$final_r
-rd    <- model$final_rd
+## -----------------------------------------------------------------------------
+model <- glicko_run(data = gpheats[1:16, ], 
+                    rank | id ~ player(rider))
 
-glicko_run(rank|id ~ name, data, r=r, rd=rd)$final_r
+## -----------------------------------------------------------------------------
+glicko_run(
+  formula = rank | id ~ player(rider), 
+  data = gpheats[17:20, ], 
+  r    = model$final_r, 
+  rd   = model$final_rd
+  )$final_r
 
-## ------------------------------------------------------------------------
-gpheats %<>% mutate(weight = ifelse(heat >= (max(heat)-3),2,1) )
-glicko  <- glicko_run(rank|id ~ rider, gpheats, weight="weight")
+## -----------------------------------------------------------------------------
+library(dplyr)
+data <- mutate(data, 
+               weight = ifelse(heat >= (max(heat) - 3), 2, 1))
 
-## ------------------------------------------------------------------------
-bbt1 <- bbt_run(rank|id~rider, gpheats,kappa=0.9)
-bbt2 <- bbt_run(rank|id~rider, gpheats,kappa=0.5)
+glicko <- glicko_run(formula = rank | id ~ player(rider), 
+                     data = data, 
+                     weight = "weight")
 
-all(bbt1$final_rd > bbt2$final_rd)
+## -----------------------------------------------------------------------------
+bbt1 <- bbt_run(formula = rank | id ~ player(rider),
+                data = data, 
+                kappa = 0.99) # RD decreases at most 1%
 
-## ------------------------------------------------------------------------
-gpheats %<>% mutate(beta = ifelse(heat >= (max(heat)-3),2,1)  )
-dbl <- dbl_run(rank|id~rider, beta="beta", data=gpheats) 
+bbt2 <- bbt_run(formula = rank | id ~ player(rider), 
+                data = data, 
+                kappa = 0.8)  # RD decreases at most 20%
 
-## ------------------------------------------------------------------------
-sigma   <- unique(gpheats$rider) %>% setNames( runif(0.1,0.5, n = length(.)) , . )
-glicko2 <- glicko2_run(rank|id~rider,gpheats, sigma=sigma)
+all(bbt1$final_rd >= bbt2$final_rd)
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 # bbt example
-gpheats %<>%
-  group_by(rider) %>%
-  mutate( days_scaled = as.integer(date - lag(date))/90,
-          days_scaled = if_else(days_scaled>1,1.0, days_scaled)) %>%
-  filter( !is.na(days_scaled) )
+data <- data %>%
+ group_by(rider) %>%
+ mutate(idle_30d = if_else(as.integer(date - lag(date)) > 30, 1.0, 2.0)) %>%
+ filter(!is.na(idle_30d))
 
-bbt <- bbt_run( rank|id ~ rider, data=gpheats, sigma="days_scaled")
+bbt <- bbt_run(rank | id ~ player(rider),
+               data = data, 
+               lambda = "idle_30d")
+
+## -----------------------------------------------------------------------------
+glicko2 <- glicko2_run(
+    data = data.frame(
+    id = c(1, 1, 1, 1),
+    team = c("A", "A", "B", "B"),
+    player = c("a", "b", "c", "d"),
+    rank_team = c(1, 1, 2, 2),
+    share = c(0.4, 0.6, 0.5, 0.5)
+  ), 
+  formula = rank_team | id ~ player(player | team),
+  share = "share"
+ )
+
+glicko2$final_r
+
+## -----------------------------------------------------------------------------
+glicko2$pairs
+glicko2$r
 

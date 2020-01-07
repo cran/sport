@@ -9,9 +9,10 @@
 \arguments{
 \item{x}{of class rating}
 
-\item{n}{number of players to be plotted}
+\item{n}{number of teams to be plotted}
 
-\item{players}{optional vector with names of the players (coefficients) to plot their evolution in time.}
+\item{players}{optional vector with names of the contestants (coefficients) to plot 
+their evolution in time.}
 
 \item{...}{optional arguments}
 }
